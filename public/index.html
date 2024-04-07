@@ -1,11 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="css\style.css">
+    <title>Catálogo</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
+
 </head>
+
+
 <body>
-    <h1>Teste</h1>
+    <h2>Gerador de catalogos LEGO</h2>
+    <p class="lead">Aceita a planilha do Adilson <b>Arquivos .xlsx</p>
+
+    <!-- Upload  -->
+    <form action="" id="file-upload-form" class="uploader">
+
+        <input id="fileUpload" type="file" name="fileUpload" accept=".xlsx">
+
+        <label for="fileUpload" id="file-drag">
+
+            <div id="start">
+                <i class="fa fa-download" aria-hidden="true"></i>
+                <div class="selectFile">Selecione um arquivo aqui</div>
+
+                    <span id="file-upload-btn" class="btn btn-primary">Selecione</span>
+                
+                        <div id ="loader" class="loader">
+                            <p class="p-loader" ></p>
+                            <div id="c-loader" ></div>
+                        </div>
+                </div>
+                    
+            </div>
+                
+             
+        </label>
+        
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.0/dist/pptxgen.bundle.js"></script>
+    <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+    <script>
+        const input = document.querySelector('input');
+        const formData = new FormData();
+        
+        let initialRow = 8;
+        function loader (text,validate){
+            document.querySelector('.p-loader').textContent = text
+            console.log(validate)
+            let loadCircle = document.querySelector('#c-loader')
+
+            if(validate == 0){
+                loadCircle.classList.remove("c-complete")
+                loadCircle.classList.add("c-loader")
+            }else if(validate == 1){
+  
+                loadCircle.classList.remove("c-loader")
+                loadCircle.classList.add("c-complete")
+            }else if(validate == 2){
+                loadCircle.classList.remove("c-loader")
+            }
+            }
+
+        input.addEventListener('change', () => {
+
+            let text = `Carregando arquivo...`
+            
+            let validate = 0
+            loader(text,validate)
+
+            
+            readXlsxFile(input.files[0]).then(function (data) {
+
+                
+                text = `Gerando ─=≡Σ((( つ◕ل͜◕)つ Catálogo...`
+                let validate = 0
+                loader(text,validate)
+                let csvArray = []
+                const excel = data
+                console.log(excel)
+
+             let lineToCheck = excel[initialRow] 
+             let cell = String(lineToCheck[1])
+             let linkType
+             console.log(cell)
+                switch (cell.substring(0,3)){
+                case "411":
+                    console.log('Lista LEGO')
+                    linkType = "LEGO"
+                    filterInformation(excel,linkType)
+                    break
+                case "422":
+                    console.log('Lista MGA')
+                    linkType = "MGA"
+                    alert('Ainda não possuímos banco de imagens para catálogo MGA.\nNo momento é possível gerar catálogos LEGO e LEGO Education.')
+                    //filterInformation(excel,linkType)
+                    text = '⤜(ⱺ ʖ̯ⱺ)⤏ MGA ainda não dá... ⤜(ⱺ ʖ̯ⱺ)⤏'
+                    validate = 2
+                    loader(text,validate)
+                    break
+                case "433":
+                    console.log('Lista LEGO Education')
+                    linkType = "Education"
+
+                    filterInformation(excel,linkType)
+                    break
+                default :
+                    alert('formato incorreto da planilha ')
+                    text = '(눈_눈)'
+                    validate = 2
+                    loader(text,validate)
+                    break
+                }
+
+            
+          
+            
+            function filterInformation(excel,linkType){
+                    let lego_code = 0
+                    let lego_name = 2
+                    let lego_line = 3
+                    let lego_age_group = 4
+                    let release_date = 5
+                    let lego_price
+                    if(linkType =="Education"){
+                         lego_price = 7
+                    }else{
+                         lego_price = 8
+                    }
+
+                for(i = initialRow;i<excel.length; i++){
+
+                    let excelRow = excel[i];
+                    csvArray.push(excelRow[lego_code])
+
+                    if(linkType =="Education"){
+                        let name = excelRow[lego_name]+"\n(idade "+String(excelRow[lego_age_group]+")")
+                        csvArray.push(name.toLocaleLowerCase())
+
+                    }else{
+                    csvArray.push(excelRow[lego_name])
+                }
+                    if(linkType =="Educations"){
+                        let age_group = excelRow[lego_age_group]
+                        age_group = age_group.replace("+","")
+                        age_group = age_group.replace("½",".5")
+                        age_group = Number(age_group)
+                        console.log("idade "+age_group)
+                        console.log(excelRow[lego_line])
+
+                        if(age_group <= 5){
+
+                            csvArray.push("educacao_infantil")
+
+                        }else if(age_group >= 6 && age_group <= 12){
+                        
+                            csvArray.push("fundamental")
+
+                        }else if(age_group > 12){
+
+                            csvArray.push("ensino_medio")
+
+                        }
+                            
+                            
+                                
+                        
+                    }else{
+                        let linha = excelRow[lego_line].toLowerCase()
+                        linha = linha.replace(" ","_")
+                        linha = linha.replace(" ","_")
+                            if(linha == "lego_classic"){
+                            linha = "classic"    
+                        }
+                        if(linha == "4+"){
+                            linha = "juniors"
+                        }
+                        if(linha == "art"){
+                            linha = "lego_art"
+                        }
+                        csvArray.push(linha)
+                    }
+                
+                if(linkType =="Education"){
+                    csvArray.push("old")
+                }else{
+                    if(excelRow[release_date]!=null){
+                        csvArray.push("new")
+                    }else{
+                        csvArray.push("old")
+                    }
+                }
+                   
+                    csvArray.push("R$ "+excelRow[lego_price])
+
+                }
+                
+                arrayObjects(csvArray,linkType)
+                
+            }
+            });
+            console.log(arrayObjects)
+
+        })
+        
+    </script>
 </body>
+
 </html>
