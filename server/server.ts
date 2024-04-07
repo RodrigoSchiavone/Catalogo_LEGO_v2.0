@@ -17,8 +17,6 @@ app.register(fastifyStatic, {
 })
 
 
-
-
 app.post('/xlInfo', async (request, reply) => {
     try {
     
