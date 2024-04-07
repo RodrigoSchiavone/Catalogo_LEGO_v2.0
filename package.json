@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "tsx server/server.ts",
-    "build" : "tsup server",
-    "start" : "node dist/server.js",
+    "build": "tsup server",
+    "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "fastify": "^4.26.2",
+    "path": "^0.12.7",
     "zod": "^3.22.4"
   }
 }
