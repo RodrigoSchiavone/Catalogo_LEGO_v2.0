@@ -1,6 +1,7 @@
 import fastify from "fastify";
 import {z} from 'zod';
 import path from 'path';
+import fastifyStatic from '@fastify/static';
 
 const app = fastify()
 
@@ -10,18 +11,12 @@ const excelDataSchema = z.object({
 
 })
 
+app.register(fastifyStatic, {
+    root: path.join(__dirname, '..', 'public'), 
+    prefix: '/' 
+})
 
-app.get('/', async (request, reply) => {
-    try {
-      // Caminho para o arquivo index.html
-      const indexPath = path.join(__dirname, '..','public', 'index.html');
-  
-      // Envia o arquivo index.html como resposta
-      reply.sendFile('index.html', indexPath);
-    } catch (error) {
-      reply.code(500).send('Erro ao processar a solicitação');
-    }
-  });
+
 
 
 app.post('/xlInfo', async (request, reply) => {

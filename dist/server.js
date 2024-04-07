@@ -25,10 +25,19 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 // server/server.ts
 var import_fastify = __toESM(require("fastify"));
 var import_zod = require("zod");
+var import_path = __toESM(require("path"));
 var app = (0, import_fastify.default)();
 var excelDataSchema = import_zod.z.object({
   name: import_zod.z.string(),
   data: import_zod.z.record(import_zod.z.unknown())
+});
+app.get("/", async (request, reply) => {
+  try {
+    const indexPath = import_path.default.join(__dirname, "..", "public", "index.html");
+    reply.sendFile("index.html", indexPath);
+  } catch (error) {
+    reply.code(500).send("Erro ao processar a solicita\xE7\xE3o");
+  }
 });
 app.post("/xlInfo", async (request, reply) => {
   try {
